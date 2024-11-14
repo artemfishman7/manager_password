@@ -84,11 +84,11 @@ class MainWindow(QMainWindow):
         self.button_toggle = QPushButton("Показать/Скрыть", central_widget)
         self.button_toggle.setGeometry(0, 240, 120, 30)
 
-        # Добавление меню и строки состояния
+        
         self.menubar = self.menuBar()
         self.statusbar = self.statusBar()
 
-# Запуск приложения
+
 app = QtWidgets.QApplication(sys.argv)
 main_window = MainWindow()
 main_window.show()
