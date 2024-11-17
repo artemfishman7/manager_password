@@ -1,19 +1,35 @@
 import sys
+import sqlite3
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import *
 
-# класс сохарнения данных
+
+# подключение к базе данных
+conn = sqlite3.connect('my_database.db')
+cursor = conn.cursor()
+
+# создание таблицы
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS passwords (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    login TEXT NOT NULL,
+    password TEXT NOT NULL
+)
+''')
+conn.commit()
+
+
+# класс для кнопки сохранения 
 class SaveButton(QPushButton):
     def __init__(self, table_widget, line_name, line_login, line_password):
-        super().__init__("Сохранить") 
+        super().__init__("Сохранить")
         self.table_widget = table_widget
         self.line_name = line_name
         self.line_login = line_login
         self.line_password = line_password
 
-       
         self.clicked.connect(self.add_password)
-    
 
     def add_password(self):
         
@@ -21,10 +37,14 @@ class SaveButton(QPushButton):
         login = self.line_login.text()
         password = self.line_password.text()
 
-        # проверка на заполненность данными
+        
         if not name or not login or not password:
             QMessageBox.warning(self, "Ошибка", "Все поля должны быть заполнены!")
             return
+
+        # Сохранение данных в таблицу базы данных
+        cursor.execute('INSERT INTO passwords (name, login, password) VALUES (?, ?, ?)', (name, login, password))
+        conn.commit()
 
         
         row_position = self.table_widget.rowCount()
@@ -38,22 +58,23 @@ class SaveButton(QPushButton):
         self.line_login.clear()
         self.line_password.clear()
 
-# внешний вид приложения
+
+# Основной класс приложения
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setup_ui()  
-    
-    
+        self.setup_ui()
+        self.load_data()
+
     def setup_ui(self):
         self.setWindowTitle("Менеджер паролей")
-        self.setGeometry(100, 100, 400, 300)  
+        self.setGeometry(100, 100, 400, 300)
+
         
-        # Основной виджет приложения
         central_widget = QtWidgets.QWidget(self)
         self.setCentralWidget(central_widget)
+
         
-        # Поля для ввода названия, логина и пароля
         self.line_name = QLineEdit(central_widget)
         self.line_name.setPlaceholderText('Название')
         self.line_name.setGeometry(10, 10, 120, 25)
@@ -66,29 +87,40 @@ class MainWindow(QMainWindow):
         self.line_password.setPlaceholderText('Пароль')
         self.line_password.setGeometry(270, 10, 120, 25)
 
-        # Таблица для отображения добавленных данных
+        
         self.table_widget = QTableWidget(0, 3, central_widget)
         self.table_widget.setGeometry(10, 50, 380, 180)
         self.table_widget.setHorizontalHeaderLabels(["Название", "Логин", "Пароль"])
 
-        # Кнопка для удаления выбранной строки
+        
         self.button_delete = QPushButton("Удалить", central_widget)
         self.button_delete.setGeometry(260, 240, 130, 30)
+        
 
-        # Кнопка для сохранения введенных данных
+        
         self.button_save = SaveButton(self.table_widget, self.line_name, self.line_login, self.line_password)
         self.button_save.setParent(central_widget)
         self.button_save.setGeometry(130, 240, 120, 30)
+
         
-        # Кнопка для показа/скрытия пароля
         self.button_toggle = QPushButton("Показать/Скрыть", central_widget)
         self.button_toggle.setGeometry(0, 240, 120, 30)
+    
 
-        # Добавление меню и строки состояния
-        self.menubar = self.menuBar()
-        self.statusbar = self.statusBar()
+    def load_data(self):
+        # Загрузка данных из базы 
+        cursor.execute('SELECT name, login, password FROM passwords')
+        rows = cursor.fetchall()
+        for row in rows:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(row_position, 0, QTableWidgetItem(row[0]))
+            self.table_widget.setItem(row_position, 1, QTableWidgetItem(row[1]))
+            self.table_widget.setItem(row_position, 2, QTableWidgetItem(row[2]))
 
-# Запуск приложения
+    
+
+
 app = QtWidgets.QApplication(sys.argv)
 main_window = MainWindow()
 main_window.show()
