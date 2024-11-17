@@ -120,15 +120,7 @@ class MainWindow(QMainWindow):
 
     
 
-<<<<<<< HEAD
 
-=======
-        
-        self.menubar = self.menuBar()
-        self.statusbar = self.statusBar()
-
-
->>>>>>> origin/main
 app = QtWidgets.QApplication(sys.argv)
 main_window = MainWindow()
 main_window.show()
