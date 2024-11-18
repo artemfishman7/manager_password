@@ -2,6 +2,7 @@ import sys
 import sqlite3
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import *
+from Savebutton import SaveButton
 
 
 # подключение к базе данных
@@ -18,46 +19,6 @@ CREATE TABLE IF NOT EXISTS passwords (
 )
 ''')
 conn.commit()
-
-
-# класс для кнопки сохранения 
-class SaveButton(QPushButton):
-    def __init__(self, table_widget, line_name, line_login, line_password):
-        super().__init__("Сохранить")
-        self.table_widget = table_widget
-        self.line_name = line_name
-        self.line_login = line_login
-        self.line_password = line_password
-
-        self.clicked.connect(self.add_password)
-
-    def add_password(self):
-        
-        name = self.line_name.text()
-        login = self.line_login.text()
-        password = self.line_password.text()
-
-        
-        if not name or not login or not password:
-            QMessageBox.warning(self, "Ошибка", "Все поля должны быть заполнены!")
-            return
-
-        # Сохранение данных в таблицу базы данных
-        cursor.execute('INSERT INTO passwords (name, login, password) VALUES (?, ?, ?)', (name, login, password))
-        conn.commit()
-
-        
-        row_position = self.table_widget.rowCount()
-        self.table_widget.insertRow(row_position)
-        self.table_widget.setItem(row_position, 0, QTableWidgetItem(name))
-        self.table_widget.setItem(row_position, 1, QTableWidgetItem(login))
-        self.table_widget.setItem(row_position, 2, QTableWidgetItem(password))
-
-        
-        self.line_name.clear()
-        self.line_login.clear()
-        self.line_password.clear()
-
 
 # Основной класс приложения
 class MainWindow(QMainWindow):
@@ -98,7 +59,7 @@ class MainWindow(QMainWindow):
         
 
         
-        self.button_save = SaveButton(self.table_widget, self.line_name, self.line_login, self.line_password)
+        self.button_save = SaveButton(self.table_widget, self.line_name, self.line_login, self.line_password, conn, cursor)
         self.button_save.setParent(central_widget)
         self.button_save.setGeometry(130, 240, 120, 30)
 
