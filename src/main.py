@@ -4,6 +4,7 @@ from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import *
 from Savebutton import SaveButton
 from Deletebutton import DeleteButton
+from Hidebutton import HideButton
 
 # подключение к бд
 conn = sqlite3.connect('my_database.db')
@@ -27,7 +28,7 @@ class MainWindow(QMainWindow):
         self.load_data()
 
     def setup_ui(self):
-        self.setWindowTitle("Менеджер паролей")
+        self.setWindowTitle("Passwords")
         self.setGeometry(100, 100, 400, 300)
 
         
@@ -46,6 +47,7 @@ class MainWindow(QMainWindow):
         self.line_password = QLineEdit(central_widget)
         self.line_password.setPlaceholderText('Пароль')
         self.line_password.setGeometry(270, 10, 120, 25)
+        self.line_password.setEchoMode(QLineEdit.EchoMode.Password)
 
         
         self.table_widget = QTableWidget(0, 3, central_widget)
@@ -55,18 +57,16 @@ class MainWindow(QMainWindow):
         
         self.button_delete = DeleteButton(self.table_widget, conn, cursor)
         self.button_delete.setParent(central_widget)
-        self.button_delete.setGeometry(260, 240, 130, 30)
+        self.button_delete.setGeometry(265, 240, 130, 30)
         
-        
-
         
         self.button_save = SaveButton(self.table_widget, self.line_name, self.line_login, self.line_password, conn, cursor)
         self.button_save.setParent(central_widget)
-        self.button_save.setGeometry(130, 240, 120, 30)
+        self.button_save.setGeometry(135, 240, 120, 30)
 
-        
-        self.button_toggle = QPushButton("Показать/Скрыть", central_widget)
-        self.button_toggle.setGeometry(0, 240, 120, 30)
+        self.button_hide = HideButton(self.line_password)
+        self.button_hide.setParent(central_widget)
+        self.button_hide.setGeometry(5, 240, 120, 30)
     
 
     def load_data(self):
