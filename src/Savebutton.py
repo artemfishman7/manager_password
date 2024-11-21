@@ -14,9 +14,9 @@ class SaveButton(QPushButton):
         self.line_password = line_password
         self.conn = conn
         self.cursor = cursor
-        self.clicked.connect(self.add_password)
+        self.clicked.connect(self.add)
 
-    def add_password(self):
+    def add(self):
         name = self.line_name.text()
         login = self.line_login.text()
         password = self.line_password.text()
@@ -26,7 +26,7 @@ class SaveButton(QPushButton):
             QMessageBox.warning(self, "Ошибка", "Все поля должны быть заполнены!")
             return
 
-        # Сохранение данных в таблицу базы данных
+        # Сохранение данных в таблицу бд
         self.cursor.execute(
             'INSERT INTO passwords (name, login, password) VALUES (?, ?, ?)',
             (name, login, password)

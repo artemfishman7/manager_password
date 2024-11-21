@@ -3,16 +3,15 @@ import sqlite3
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import *
 from Savebutton import SaveButton
+from Deletebutton import DeleteButton
 
-
-# подключение к базе данных
+# подключение к бд
 conn = sqlite3.connect('my_database.db')
 cursor = conn.cursor()
 
-# создание таблицы
+
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS passwords (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     login TEXT NOT NULL,
     password TEXT NOT NULL
@@ -54,8 +53,10 @@ class MainWindow(QMainWindow):
         self.table_widget.setHorizontalHeaderLabels(["Название", "Логин", "Пароль"])
 
         
-        self.button_delete = QPushButton("Удалить", central_widget)
+        self.button_delete = DeleteButton(self.table_widget, conn, cursor)
+        self.button_delete.setParent(central_widget)
         self.button_delete.setGeometry(260, 240, 130, 30)
+        
         
 
         
@@ -69,7 +70,7 @@ class MainWindow(QMainWindow):
     
 
     def load_data(self):
-        # Загрузка данных из базы 
+        # Загрузка данных из бд 
         cursor.execute('SELECT name, login, password FROM passwords')
         rows = cursor.fetchall()
         for row in rows:
@@ -79,7 +80,6 @@ class MainWindow(QMainWindow):
             self.table_widget.setItem(row_position, 1, QTableWidgetItem(row[1]))
             self.table_widget.setItem(row_position, 2, QTableWidgetItem(row[2]))
 
-    
 
 
 app = QtWidgets.QApplication(sys.argv)
