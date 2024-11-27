@@ -14,9 +14,9 @@ class HideButton(QPushButton):
         self.passwords.setEchoMode(QLineEdit.EchoMode.Password)
 
         # Привязка  к кнопке
-        self.clicked.connect(self.toggle_password_visibility)
+        self.clicked.connect(self.hide)
 
-    def toggle_password_visibility(self):
+    def hide(self):
         if self.passwords.echoMode() == QLineEdit.EchoMode.Password:
             # Показ пароля
             self.passwords.setEchoMode(QLineEdit.EchoMode.Normal)

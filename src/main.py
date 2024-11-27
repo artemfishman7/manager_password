@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QMainWindow, QLineEdit, QTableWidget, QTableWidgetIt
 from Savebutton import SaveButton
 from Deletebutton import DeleteButton
 from Hidebutton import HideButton
+from Searchbutton import SearchButton
 
 # Подключение к БД
 conn = sqlite3.connect('my_database.db')
@@ -20,7 +21,6 @@ CREATE TABLE IF NOT EXISTS passwords (
 ''')
 conn.commit()
 
-
 # Основной класс приложения
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
 
     def setup_ui(self):
         self.setWindowTitle("Passwords")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 400, 310)
 
         central_widget = QtWidgets.QWidget(self)
         self.setCentralWidget(central_widget)
@@ -70,6 +70,14 @@ class MainWindow(QMainWindow):
         self.button_hide = HideButton(self.line_password)
         self.button_hide.setParent(central_widget)
         self.button_hide.setGeometry(5, 240, 120, 30)
+
+        self.search_button = QLineEdit(central_widget)
+        self.search_button.setPlaceholderText('Поиск по названию')
+        self.search_button.setGeometry(10, 280, 260, 25)
+
+        self.button_search = SearchButton(self.table_widget, self.search_button, cursor)
+        self.button_search.setParent(central_widget)
+        self.button_search.setGeometry(280, 280, 110, 25)
 
     # загрузка информации из бд
     def load_data(self):
